@@ -20,7 +20,7 @@ export const fetchApi = async () => {
 export async function getPages() {
     try {
         const page = await generatePage(exampleContent);
-        return { success: true, data: page };
+        return { success: true, data: [page] };
     } catch (error) {
         console.error('Error fetching pages:', error);
         return { success: false, error: 'Failed to fetch pages' };
