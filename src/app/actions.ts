@@ -23,3 +23,7 @@ export async function getPages() {
         return { success: false, error: 'Failed to fetch pages' };
     }
 }
+
+export async function handleFileUpload(file: File) {
+    // ...
+}
