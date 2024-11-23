@@ -6,11 +6,11 @@ const anthropic = new Anthropic({
 });
 
 export async function handleQuestionAnswered(page: Page, selection?: number, response?: string) {
-    if(page.multipleChoice && selection && !page.multipleChoice[selection].correct) {
-        
+    if(page.multipleChoice && selection) {
+        return explainMultipleChoiceResponse(page.content[0], page.question, page.multipleChoice[selection].answer, page.multipleChoice[selection].correct);
     }
     if(response) {
-        return evaluateTextResponse(page.content, page.question, response);
+        return evaluateTextResponse(page.content[0], page.question, response);
     }
 }
   
@@ -18,6 +18,56 @@ interface TextEvaluation {
     isCorrect: boolean;
     explanation: string;
     confidence: number;  // 0-1 score of how confident the evaluation is
+}
+
+export async function explainMultipleChoiceResponse(
+    content: string,
+    question: string,
+    selectedAnswer: string,
+    isCorrect: boolean
+): Promise<TextEvaluation> {
+    try {
+        const prompt = `
+        ${isCorrect ? 'Explain why this answer is correct' : 'Explain why this answer is incorrect'} in one clear sentence.
+        
+        Context: """
+        ${content}
+        """
+
+        Question: """
+        ${question}
+        """
+
+        Selected answer: """
+        ${selectedAnswer}
+        """
+
+        Return only a single explanatory sentence.`;
+
+        const result = await anthropic.messages.create({
+            model: 'claude-3-sonnet-20240229',
+            max_tokens: 100,
+            temperature: 0.1,
+            messages: [{ role: 'user', content: prompt }]
+        });
+
+        const explanation = result.content[0].type === 'text' 
+            ? result.content[0].text.trim() 
+            : `The answer "${selectedAnswer}" is ${isCorrect ? 'correct' : 'incorrect'}.`;
+
+        return {
+            isCorrect,
+            explanation,
+            confidence: 1.0  // Always 1.0 for multiple choice
+        };
+
+    } catch (error) {
+        return {
+            isCorrect,
+            explanation: `The answer "${selectedAnswer}" is ${isCorrect ? 'correct' : 'incorrect'}.`,
+            confidence: 1.0
+        };
+    }
 }
   
 export async function evaluateTextResponse(
