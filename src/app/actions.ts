@@ -1,6 +1,6 @@
 'use server'
 
-import { handleQuestionAnswered } from './algorithm';
+import exampleData from './example.json';
 import { createContent } from './fileUpload';
 import { generatePages } from './questions';
 
@@ -17,7 +17,9 @@ export const fetchApi = async () => {
 
 export async function getPages() {
     try {
-        const pages = await generatePages(exampleContent, title);
+        // let pages = [];
+
+        // const pages = await generatePages(exampleContent, title);
         // console.log(await handleQuestionAnswered(pages[0], 1));
         return { success: true, data: pages };
     } catch (error) {
