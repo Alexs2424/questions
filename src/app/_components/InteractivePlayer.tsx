@@ -89,10 +89,13 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
     const [answerReceived, setAnswerReceived] = useState(false)
     const [evaluation, setEvaluation] = useState<TextEvaluation>()
     const formRef = useRef<HTMLFormElement>(null)
+    const [submitLoading, setSubmitLoading] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         // TODO: Implement API call
+
+        setSubmitLoading(true)
         
         const evaluationResponse = await handleQuestionAnswered(page, multipleChoiceAnswer || undefined, answer || undefined, isCorrect)
         // const evaluationResponse = testEvaluation
@@ -102,6 +105,7 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
         
         setNextDisabled(false)
         setAnswerReceived(true)
+        setSubmitLoading(false)
     }
 
     const handleContinue = () => {
@@ -177,10 +181,17 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
                             )}
                             {!answerReceived && <button
                                 type="submit"
-                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 w-full sm:w-auto"
-                                disabled={(!multipleChoiceAnswer && !answer) || answerReceived}
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 w-full sm:w-auto flex items-center justify-center gap-2"
+                                disabled={(!multipleChoiceAnswer && !answer) || answerReceived || submitLoading}
                             >
-                                Submit
+                                {submitLoading ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        Submitting...
+                                    </>
+                                ) : (
+                                    'Submit'
+                                )}
                             </button>}
                         </form>
                     </div>
