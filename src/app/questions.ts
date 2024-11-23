@@ -171,16 +171,19 @@ function shuffleArray<T>(array: T[]): T[] {
     return shuffled;
 }
 
-export async function generatePages(content: string): Promise<Page[]> {
+export async function generatePages(content: string, title: string): Promise<Page[]> {
     const questions = await generateMultipleChoiceQuestionsFromText(content, 2); // Generate 2 questions
     const pages: Page[] = [];
 
     for (const question of questions) {
         const page = await generateMultipleChoicePage(content, question);
+        page.title = title;
         pages.push(page);
     }
     const shortResponseQuestion = await generateShortResponseQuestion(content);
-    pages.push(await generateTextPage(content, shortResponseQuestion));
+    const page = await generateTextPage(content, shortResponseQuestion);
+    page.title = title;
+    pages.push(page);
     return pages;
 }
 

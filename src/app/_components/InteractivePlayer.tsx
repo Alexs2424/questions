@@ -122,6 +122,7 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
 
     return (
         <div className="flex flex-col gap-5">
+            <h1 className="text-3xl font-bold text-center mb-8">{page.title}</h1>
             {page != null && 
                 <div className=" bg-[#f8f8f3] rounded-[16px] shadow-md border border-gray-100 p-6">
                     {page.content.map((contentParagraph, idx) => (
