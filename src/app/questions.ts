@@ -1,10 +1,10 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { Anthropic } from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.ANTHROPIC_API_KEY || ''
 });
 
-export async function generateQuestionsFromText(text: string, numQuestions: number = 3) {
+export async function generateQuestionsFromText(text: string, numQuestions = 3): Promise<string[]> {
   try {
     const prompt = `Given the following text, generate ${numQuestions} thought-provoking questions about its content. Format the questions as a JSON array of strings.
 
@@ -25,14 +25,106 @@ Generate ${numQuestions} questions about this text. Return only a JSON array of 
         },
       ],
     });
-
-    // Parse the response to get questions
-    const content = response.content[0].text;
-    const questions = JSON.parse(content);
-    
-    return questions;
+    if (response.content[0].type === 'text') {
+        try {
+            const content = response.content[0].text;
+            const parsed = await JSON.parse(content);
+            // Verify it's an array and all elements are strings
+            if (!Array.isArray(parsed) || !parsed.every(item => typeof item === 'string')) {
+              console.error('Response was not an array of strings:', parsed);
+              return [];
+            }
+            return parsed;
+          } catch (error) {
+            console.error('Failed to parse JSON response:', error);
+            return [];
+        }
+    }
+    return [];
   } catch (error) {
     console.error('Error generating questions:', error);
     throw new Error('Failed to generate questions');
   }
 }
+
+export async function generateCorrectAnswer(context: string, question: string): Promise<string> {
+    try {
+      const prompt = `
+        Given the following context and question, generate the correct answer.
+        Return only the answer as a plain text string, without any additional formatting or explanation.
+  
+        Context: """
+        ${context}
+        """
+  
+        Question: """
+        ${question}
+        """
+  
+        Return only the correct answer as a plain text string.
+      `;
+  
+      const response = await anthropic.messages.create({
+        model: 'claude-3-sonnet-20240229',
+        max_tokens: 1000,
+        temperature: 0.1, // Lower temperature for more focused/accurate response
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+      });
+  
+      if (response.content[0].type === 'text') {
+        return response.content[0].text.trim();
+      }
+      
+      return '';
+    } catch (error) {
+      console.error('Error generating answer:', error);
+      return '';
+    }
+  }
+
+  export async function generateIncorrectAnswer(context: string, question: string): Promise<string> {
+    try {
+      const prompt = `
+        Given the following context and question, generate an incorrect answer.
+        Return only the answer as a plain text string, without any additional formatting or explanation.
+  
+        Context: """
+        ${context}
+        """
+  
+        Question: """
+        ${question}
+        """
+  
+        Return only the incorrect answer as a plain text string.
+      `;
+  
+      const response = await anthropic.messages.create({
+        model: 'claude-3-sonnet-20240229',
+        max_tokens: 1000,
+        temperature: 0.5, // Lower temperature for more focused/accurate response
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+      });
+  
+      if (response.content[0].type === 'text') {
+        return response.content[0].text.trim();
+      }
+      
+      return '';
+    } catch (error) {
+      console.error('Error generating answer:', error);
+      return '';
+    }
+  }
+
+  
