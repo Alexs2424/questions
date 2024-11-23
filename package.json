@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
+    "@google-cloud/vision": "^4.3.2",
     "dotenv": "^16.4.5",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
