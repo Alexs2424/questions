@@ -132,6 +132,11 @@ export async function explainMultipleChoiceResponse(
         };
     }
 }
+
+function removeFirstAndLastLines(text: string): string {
+    const lines = text.split('\n');
+    return lines.slice(1, -1).join('\n');
+}
   
 export async function evaluateTextResponse(
     content: string, 
@@ -170,7 +175,16 @@ export async function evaluateTextResponse(
       });
   
       if (result.content[0].type === 'text') {
-        const evaluation = JSON.parse(result.content[0].text);
+        console.log(result.content[0].text);
+        let response: string;
+        if (result.content[0].text.startsWith("```")) {
+            response = removeFirstAndLastLines(result.content[0].text);
+        }
+        else {
+            response = result.content[0].text;
+        }
+
+        const evaluation = JSON.parse(response);
 
 
         if(!evaluation.isCorrect) {
