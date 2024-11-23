@@ -3,15 +3,23 @@
 import { useState, useRef } from "react"
 import { Page } from "../dataschema"
 
-
-
-const DATA: Page[] = [{
+export const DATA: Page[] = [{
     content: [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
       
       "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
       
-      "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem."
+      "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+      
+      "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
+      
+      "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+      
+      "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
+      
+      "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
     ],
     question: "What is the main theme discussed in this passage about voluptas (pleasure)?",
     multipleChoice: [
@@ -55,7 +63,6 @@ const DATA: Page[] = [{
 //     userInput: any; // this could be a multiple choice object or
 //     feedback: string;
 // }
-  
 
 export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
     const [currentPageIndex, setCurrentPageIndex] = useState(0)
@@ -86,82 +93,85 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
     }
 
     return (
-        <div>
+        <div className="flex flex-col gap-5">
             {page != null && 
-                <div className="max-w-2xl">
-                <p className="whitespace-pre-wrap leading-relaxed">
-                  {page.content}
-                </p>
-              </div>
+                <div className=" bg-[#f8f8f3] rounded-[16px] shadow-md border border-gray-100 p-6">
+                    {page.content.map((contentParagraph, idx) => (
+                        <p className="whitespace-pre-wrap leading-relaxed mb-4" key={idx}>
+                            {contentParagraph}
+                        </p>
+                    ))}
+                </div>
             }
 
-            {/* question - answer section */}
             {page != null && (
-                <div className="w-full max-w-2xl flex flex-col gap-6">
-                    <p className="font-semibold">
+                <div className="w-full max-w-2xl flex flex-col gap-4  p-6 self-center">
+                    <h2 className="font-semibold">
                         {page.question}
-                    </p>
-                    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        {page.answerType === 'multipleChoice' && (
-                            <>
-                                <div className="flex flex-col gap-3">
-                                    {page.multipleChoice?.map((choice, index) => (
-                                        <label key={index} className="flex items-center gap-2">
-                                            <input
-                                                type="radio"
-                                                name="multipleChoice"
-                                                value={choice.answer}
-                                                onChange={(e) => setMultipleChoiceAnswer(e.target.value)}
-                                                className="w-4 h-4 text-blue-500"
-                                                disabled={answerReceived}
-                                            />
-                                            <span className={answerReceived ? (
-                                                choice.correct ? "text-green-600 font-medium" : 
-                                                choice.answer === multipleChoiceAnswer ? "text-red-600" : ""
-                                            ) : ""}>
-                                                {choice.answer}
-                                                {answerReceived && choice.correct && (
-                                                    <span className="ml-2 text-green-600">✓</span>
-                                                )}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </>
-                        )}
-                        {page.answerType === 'text' && (
-                            <>
-                                <textarea
-                                    value={answer}
-                                    onChange={(e) => setAnswer(e.target.value)}
-                                    className="w-full h-32 p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-gray-100"
-                                    placeholder="Type your answer here..."
-                                />
-                            </>
-                        )}
-                        {!answerReceived && <button
-                            type="submit"
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
-                            disabled={(!multipleChoiceAnswer && !answer) || answerReceived}
+                    </h2>
+                    <div className="pt-3">
+                        <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
+                            {page.answerType === 'multipleChoice' && (
+                                <>
+                                    <div className="flex flex-col gap-3">
+                                        {page.multipleChoice?.map((choice, index) => (
+                                            <label key={index} className={`flex items-center gap-2 p-2 rounded-md transition-colors shadow-sm border-2 border-gray-200 ${!answerReceived ? " hover:shadow-md cursor-pointer" : ''}`}>
+                                                <input
+                                                    type="radio"
+                                                    name="multipleChoice"
+                                                    value={choice.answer}
+                                                    onChange={(e) => setMultipleChoiceAnswer(e.target.value)}
+                                                    className="w-4 h-4 text-blue-500"
+                                                    disabled={answerReceived}
+                                                />
+                                                <span className={answerReceived ? (
+                                                    choice.correct ? "text-green-600 font-medium" : 
+                                                    choice.answer === multipleChoiceAnswer ? "text-red-600" : ""
+                                                ) : ""}>
+                                                    {choice.answer}
+                                                    {answerReceived && choice.correct && (
+                                                        <span className="ml-2 text-green-600">✓</span>
+                                                    )}
+                                                </span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                            {page.answerType === 'text' && (
+                                <>
+                                    <textarea
+                                        value={answer}
+                                        onChange={(e) => setAnswer(e.target.value)}
+                                        className="w-full h-32 p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-gray-100"
+                                        placeholder="Type your answer here..."
+                                    />
+                                </>
+                            )}
+                            {!answerReceived && <button
+                                type="submit"
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 w-full sm:w-auto"
+                                disabled={(!multipleChoiceAnswer && !answer) || answerReceived}
+                            >
+                                Submit
+                            </button>}
+                        </form>
+                    </div>
+
+                    {answerReceived && <div className="p-4 flex items-end fill-slate-400 justify-end">
+                        <button 
+                            onClick={handleContinue}
+                            disabled={nextDisabled}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center content-end gap-2"
                         >
-                            Submit
-                        </button>}
-                    </form>
+                            Next
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </button>
+                    </div>}
                 </div>
             )}
-
-            {answerReceived && <div className="p-4 flex items-end fill-slate-400 justify-end">
-                <button 
-                    onClick={handleContinue}
-                    disabled={nextDisabled}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center content-end gap-2"
-                >
-                    Next
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 18l6-6-6-6"/>
-                    </svg>
-                </button>
-            </div>}
         </div>
     )
 }
