@@ -1,4 +1,5 @@
 import { Anthropic } from '@anthropic-ai/sdk';
+import type { Page } from './dataschema';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || ''
@@ -127,4 +128,60 @@ export async function generateCorrectAnswer(context: string, question: string): 
     }
   }
 
+  function shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
+  export async function generatePage(content: string): Promise<Page> {
+    try {
+      // First generate a question about the content
+      const questions = await generateQuestionsFromText(content, 1);
+      const question = questions[0] || "What is this text about?"; // fallback question
   
+      // Randomly decide between multiple choice and text answer
+      const isMultipleChoice = true;
+  
+      if (isMultipleChoice) {
+        // Generate one correct answer and three incorrect answers
+        const correctAnswer = await generateCorrectAnswer(content, question);
+        const incorrectAnswers = await Promise.all([
+          generateIncorrectAnswer(content, question),
+          generateIncorrectAnswer(content, question),
+          generateIncorrectAnswer(content, question)
+        ]);
+  
+        // Combine and shuffle answers
+        let multipleChoice = [
+          { answer: correctAnswer, correct: true },
+          ...incorrectAnswers.map(answer => ({ answer, correct: false }))
+        ];
+        multipleChoice = shuffleArray(multipleChoice);
+  
+        return {
+          content: [content],
+          question,
+          multipleChoice,
+          answerType: "multipleChoice"
+        };
+      } else {
+        return {
+          content: [content],
+          question,
+          answerType: "text"
+        };
+      }
+    } catch (error) {
+      console.error('Error generating page:', error);
+      // Return a basic page if something goes wrong
+      return {
+        content: [content],
+        question: "What is this text about?",
+        answerType: "text"
+      };
+    }
+  }
