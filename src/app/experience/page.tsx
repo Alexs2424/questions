@@ -8,7 +8,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen p-8 sm:p-20">
       <main className="max-w-4xl mx-auto flex flex-col items-center gap-8">
-        {result.success && <InteractivePlayer pages={result.data || []} />}
+        {result.success && <InteractivePlayer initialPages={result.data || []} />}
         {result.error && <>
           <h3>
             Got an error: {result.error} 

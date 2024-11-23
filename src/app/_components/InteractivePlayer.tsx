@@ -78,9 +78,9 @@ const testEvaluationIncorrect: TextEvaluation = {
 //     feedback: string;
 // }
 
-export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
+export const InteractivePlayer = ({initialPages}: {initialPages: Page[]}) => {
     const [currentPageIndex, setCurrentPageIndex] = useState(0)
-    const page = pages[currentPageIndex]
+    const [pages, setPages] = useState<Page[]>(initialPages || []);
     const [nextDisabled, setNextDisabled] = useState(true)
     const [answer, setAnswer] = useState('')
     const [multipleChoiceAnswer, setMultipleChoiceAnswer] = useState('')
@@ -90,6 +90,11 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
     const [evaluation, setEvaluation] = useState<TextEvaluation>()
     const formRef = useRef<HTMLFormElement>(null)
     const [submitLoading, setSubmitLoading] = useState(false)
+
+    if (!pages.length) {
+        return <div>No pages available</div>;
+    }
+    const page = pages[currentPageIndex]
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -101,6 +106,12 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
         // const evaluationResponse = testEvaluation
         if (evaluationResponse) {
             setEvaluation(evaluationResponse)
+            if (evaluationResponse.newPage) {
+                // Either add to existing pages or set as next page
+                setPages(prevPages => [...prevPages, evaluationResponse.newPage!]);
+                // Or if you want to replace current page:
+                // setCurrentPage(evaluationResponse.nextPage);
+            }
         }
         
         setNextDisabled(false)
