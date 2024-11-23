@@ -16,12 +16,10 @@ export const fetchApi = async () => {
 export async function getPages() {
     try {
         const pages = await generatePages(exampleContent);
-        console.log(await handleQuestionAnswered(pages[0], 1));
+        // console.log(await handleQuestionAnswered(pages[0], 1));
         return { success: true, data: pages };
     } catch (error) {
         console.error('Error fetching pages:', error);
         return { success: false, error: 'Failed to fetch pages' };
     }
 }
-
-// You can remove or modify the existing fetchApi function since we're replacing it

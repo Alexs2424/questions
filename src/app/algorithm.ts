@@ -1,5 +1,6 @@
 import { Anthropic } from '@anthropic-ai/sdk';
 import type { Page } from './dataschema';
+import { generateMultipleChoicePage, generateTextPage } from './questions';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || ''
@@ -18,6 +19,42 @@ interface TextEvaluation {
     isCorrect: boolean;
     explanation: string;
     confidence: number;  // 0-1 score of how confident the evaluation is
+    newPage?: Page;
+}
+
+export async function generateQuestionVariation(content: string, originalQuestion: string): Promise<string> {
+    try {
+        const prompt = `
+        Given this content and original question, create a different question that tests the same concept but is worded differently.
+        The new question should have the same difficulty level and test similar understanding.
+
+        Content: """
+        ${content}
+        """
+
+        Original question: """
+        ${originalQuestion}
+        """
+
+        Return only the new question as plain text, without any additional explanation.`;
+
+        const response = await anthropic.messages.create({
+            model: 'claude-3-sonnet-20240229',
+            max_tokens: 150,
+            temperature: 0.4,  // Low temperature for similar difficulty level
+            messages: [{ role: 'user', content: prompt }]
+        });
+
+        if (response.content[0].type === 'text') {
+            return response.content[0].text.trim();
+        }
+
+        return originalQuestion; // Fallback to original if generation fails
+
+    } catch (error) {
+        console.error('Error generating question variation:', error);
+        return originalQuestion;
+    }
 }
 
 export async function explainMultipleChoiceResponse(
@@ -54,11 +91,22 @@ export async function explainMultipleChoiceResponse(
         const explanation = result.content[0].type === 'text' 
             ? result.content[0].text.trim() 
             : `The answer "${selectedAnswer}" is ${isCorrect ? 'correct' : 'incorrect'}.`;
+        
+        if(!isCorrect) {
+            const questionVariation = await generateQuestionVariation(content, question);
+            const page = await generateMultipleChoicePage(content, questionVariation);
+            return {
+                isCorrect,
+                explanation,
+                confidence: 1.0,  // Always 1.0 for multiple choice
+                newPage: page,
+            };
+        }
 
         return {
             isCorrect,
             explanation,
-            confidence: 1.0  // Always 1.0 for multiple choice
+            confidence: 1.0,  // Always 1.0 for multiple choice
         };
 
     } catch (error) {
@@ -108,6 +156,18 @@ export async function evaluateTextResponse(
   
       if (result.content[0].type === 'text') {
         const evaluation = JSON.parse(result.content[0].text);
+
+
+        if(!evaluation.isCorrect) {
+            const questionVariation = await generateQuestionVariation(content, question);
+            const page = await generateTextPage(content, questionVariation);
+            return {
+                isCorrect: Boolean(evaluation.isCorrect),
+                explanation: String(evaluation.explanation),
+                confidence: Number(evaluation.confidence),
+                newPage: page
+            };
+        }
         return {
           isCorrect: Boolean(evaluation.isCorrect),
           explanation: String(evaluation.explanation),

@@ -2,8 +2,8 @@ import { DATA, InteractivePlayer } from "./_components/InteractivePlayer";
 import { fetchApi, getPages } from "./actions";
 
 export default async function Home() {
-  // const result = await getPages()
-  const result = {success: true, data: DATA, error: undefined}
+  const result = await getPages()
+  // const result = {success: true, data: DATA, error: undefined}
 
   return (
     <div className="min-h-screen p-8 sm:p-20">
