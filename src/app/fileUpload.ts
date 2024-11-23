@@ -1,7 +1,8 @@
 import OpenAI from "openai";
+import "dotenv/config";
 
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: process.env.OPEN_API_KEY,
 });
 
 export async function createContent(file: File): Promise<void> {
@@ -33,7 +34,7 @@ export async function createContent(file: File): Promise<void> {
     files: [file],
   });
 
-  console.log()
+  console.log();
 
   await openai.beta.assistants.update(assistant.id, {
     tool_resources: { file_search: { vector_store_ids: [vectorStore.id] } },
@@ -52,7 +53,7 @@ export async function createContent(file: File): Promise<void> {
     instructions: "Answer in JSON format. ",
   });
 
-  console.log('run ', run)
+  console.log("run ", run);
 
   if (run.status === "completed") {
     const messages = await openai.beta.threads.messages.list(run.thread_id);
