@@ -144,7 +144,7 @@ export async function generateCorrectAnswer(context: string, question: string): 
       const question = questions[0] || "What is this text about?"; // fallback question
   
       // Randomly decide between multiple choice and text answer
-      const isMultipleChoice = true;
+      const isMultipleChoice = await determineAnswerType(content, question) === "multipleChoice";
   
       if (isMultipleChoice) {
         // Generate one correct answer and three incorrect answers
@@ -185,3 +185,51 @@ export async function generateCorrectAnswer(context: string, question: string): 
       };
     }
   }
+
+type AnswerType = "multipleChoice" | "text";
+
+export async function determineAnswerType(content: string, question: string): Promise<AnswerType> {
+  try {
+    const prompt = `
+      Given the following content and question, determine if this should be answered as:
+      - "multipleChoice": if the question has clear, distinct possible answers
+      - "text": if the question requires explanation or has many possible valid answers
+      
+      Return ONLY the word "multipleChoice" or "text".
+
+      Content: """
+      ${content}
+      """
+
+      Question: """
+      ${question}
+      """
+
+      Return ONLY "multipleChoice" or "text".
+    `;
+
+    const response = await anthropic.messages.create({
+      model: 'claude-3-sonnet-20240229',
+      max_tokens: 100,
+      temperature: 0.1,
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+    });
+
+    if (response.content[0].type === 'text') {
+      const answer = response.content[0].text.trim().toLowerCase();
+      if (answer === 'multiplechoice') return 'multipleChoice';
+      if (answer === 'text') return 'text';
+    }
+    
+    // Default to text if we can't determine
+    return 'text';
+  } catch (error) {
+    console.error('Error determining answer type:', error);
+    return 'text';
+  }
+}
