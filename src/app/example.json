@@ -1,0 +1,34 @@
+{
+    "lesson_outline": [
+      {
+        "title": "The Stock Market Crash and the Great Depression",
+        "subtitle": "Black Tuesday and the Domino Effect",
+        "content": "The Great Depression began with the infamous stock market crash on October 29, 1929, known as \"Black Tuesday.\" Over 16 million shares were sold in a frenzy, and in just two months, $40 billion of wealth vanished. This financial disaster triggered a chain reaction: over 5,000 banks failed within three years, wiping out personal savings and deepening the economic crisis. Speculation, buying on margin, and unchecked credit practices fueled the crash. Combined with overproduction and low consumer spending, these factors led to one of the most severe economic downturns in history, leaving millions unemployed and destitute."
+      },
+      {
+        "title": "Herbert Hoover's Leadership During Crisis",
+        "subtitle": "Rugged Individualism Meets Reality",
+        "content": "President Herbert Hoover believed in \"rugged individualism,\" trusting that the economy would recover without significant government intervention. While he adhered to laissez-faire principles, Hoover did take limited action, such as creating the Reconstruction Finance Corporation to lend money to banks and businesses. However, his refusal to provide direct aid to struggling individuals drew widespread criticism. Events like the violent eviction of the Bonus Army—WWI veterans demanding early bonus payments—symbolized his failure to connect with the suffering public. As shantytowns, mockingly called \"Hoovervilles,\" grew across the nation, his popularity plummeted, setting the stage for a new approach to leadership."
+      },
+      {
+        "title": "Franklin D. Roosevelt and the New Deal",
+        "subtitle": "The First Hundred Days of Hope",
+        "content": "When Franklin D. Roosevelt took office in 1933, he inspired hope with his iconic declaration, \"The only thing we have to fear is fear itself.\" In his first 100 days, FDR launched an ambitious agenda to address the economic crisis. The Glass-Steagall Act restored trust in banks by creating the FDIC, ensuring deposits were safe. Fireside Chats, his informal radio broadcasts, reassured Americans and united the nation. Bold policies like taking the U.S. off the gold standard aimed to stimulate inflation and ease debt burdens. These measures marked the beginning of the New Deal, a transformative era that redefined the role of government in citizens' lives."
+      },
+      {
+        "title": "The New Deal Programs",
+        "subtitle": "Relief, Recovery, and Reform",
+        "content": "FDR's New Deal introduced a series of programs to combat the Depression. Relief efforts, such as the Civilian Conservation Corps (CCC) and the Works Progress Administration (WPA), created millions of jobs in public works, ranging from infrastructure projects to artistic endeavors. Recovery programs like the Agricultural Adjustment Act (AAA) paid farmers to reduce crop production, stabilizing prices, while the Public Works Administration (PWA) invested in long-term economic growth. Reform initiatives, such as the Social Security Act, provided pensions and unemployment insurance, and the Wagner Act strengthened labor unions by guaranteeing workers the right to collective bargaining. Together, these measures reshaped the economy and emphasized the government's responsibility for citizens' welfare."
+      },
+      {
+        "title": "Challenges to the New Deal",
+        "subtitle": "Critics from Both Sides",
+        "content": "The New Deal was not without controversy. Conservatives, including the American Liberty League, denounced it as \"socialist,\" opposing government intervention in the economy. On the other side, radical critics like Huey Long proposed even more drastic solutions, such as his \"Share Our Wealth\" plan, which sought to tax the rich and provide every family with $5,000. Others, like Father Charles Coughlin and Dr. Francis Townsend, argued the New Deal didn't go far enough to help struggling Americans. Meanwhile, the Supreme Court dealt setbacks by declaring key programs, such as the AAA and the NRA, unconstitutional. Despite these challenges, the New Deal left a lasting legacy of government action during crises."
+      },
+      {
+        "title": "Natural Disasters and the Dust Bowl",
+        "subtitle": "A Storm of Misfortune",
+        "content": "While the Depression devastated cities, rural America faced its own calamity: the Dust Bowl. Years of over-farming and drought in the 1930s turned fertile plains into barren dust storms. High winds swept across states like Oklahoma, Texas, and Kansas, driving thousands of farmers from their land. These \"Dust Bowl refugees,\" often portrayed in John Steinbeck's The Grapes of Wrath, migrated west in search of work and stability. The environmental disaster compounded the economic crisis, highlighting the desperate need for both agricultural reform and federal aid, which programs like the Soil Conservation Service eventually sought to address."
+      }
+    ]
+  }
