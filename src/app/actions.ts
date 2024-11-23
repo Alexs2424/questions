@@ -17,9 +17,11 @@ export const fetchApi = async () => {
 
 export async function getPages() {
     try {
-        // let pages = [];
-
-        // const pages = await generatePages(exampleContent, title);
+        let pages: any[] = [];
+        for(const outline of exampleData.lesson_outline.slice(0, 3)) {
+            console.log(outline);
+            pages = pages.concat(await generatePages(outline.content, outline.title));
+        }
         // console.log(await handleQuestionAnswered(pages[0], 1));
         return { success: true, data: pages };
     } catch (error) {
