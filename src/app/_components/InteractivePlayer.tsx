@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from "react"
+import { Page } from "../dataschema"
 
 
 
@@ -56,9 +57,9 @@ const DATA: Page[] = [{
 // }
   
 
-export const InteractivePlayer = ({}) => {
+export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
     const [currentPageIndex, setCurrentPageIndex] = useState(0)
-    const page = DATA[currentPageIndex]
+    const page = pages[currentPageIndex]
     const [nextDisabled, setNextDisabled] = useState(true)
     const [answer, setAnswer] = useState('')
     const [multipleChoiceAnswer, setMultipleChoiceAnswer] = useState('')

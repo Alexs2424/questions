@@ -9,11 +9,11 @@ export async function generateQuestionsFromText(text: string, numQuestions = 3):
     try {
         const prompt = `Given the following text, generate ${numQuestions} questions about its content. Format the questions as a JSON array of strings.
 
-Text: """
-${text}
-"""
+    Text: """
+    ${text}
+    """
 
-Generate ${numQuestions} questions about this text. Return only a JSON array of questions.`;
+    Generate ${numQuestions} questions about this text. Return only a JSON array of questions.`;
 
         const response = await anthropic.messages.create({
             model: 'claude-3-sonnet-20240229',
