@@ -2,14 +2,20 @@
 
 import { useState } from 'react'
 
-export default function QuestionAnswer({data}: {data: Page}) {
-  const [question, setQuestion] = useState('')
+export default function QuestionAnswer({data, handleAnswer}: {data: Page, handleAnswer: () => void}) {
   const [answer, setAnswer] = useState('')
+  const [multipleChoiceAnswer, setMultipleChoiceAnswer] = useState('')
+  const [answerReceived, setAnswerReceived] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // TODO: Implement API call
-    setAnswer('This is a sample answer') 
+    handleAnswer()
+    setAnswerReceived(true)
+
+
+    
+
   }
 
   return (
@@ -28,7 +34,7 @@ export default function QuestionAnswer({data}: {data: Page}) {
                                 type="radio"
                                 name="multipleChoice"
                                 value={choice.answer}
-                                onChange={(e) => setQuestion(e.target.value)}
+                                onChange={(e) => setMultipleChoiceAnswer(e.target.value)}
                                 className="w-4 h-4 text-blue-500"
                             />
                             <span>{choice.answer}</span>
@@ -38,19 +44,32 @@ export default function QuestionAnswer({data}: {data: Page}) {
                 </>
             )
         }
+        {
+            data.answerType === 'text' && (
+                <>
+                <textarea 
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    className="w-full h-32 p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-gray-100"
+                    placeholder="Type your answer here..."
+                />
+                </>
+            )
+        }
         <button 
           type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+          disabled={(!multipleChoiceAnswer && !answer)}
         >
           Submit
         </button>
       </form>
 
-      {answer && (
+      {/* {answer && (
         <div className="p-4 bg-gray-50 rounded-lg">
           <p className="whitespace-pre-wrap">{answer}</p>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

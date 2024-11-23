@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from "react"
-import QuestionAnswer from "./QuestionAnswer"
-import Content from "./Content"
+import { useState, useRef } from "react"
+
+
 
 const DATA: Page[] = [{
     content: [
@@ -49,25 +49,131 @@ const DATA: Page[] = [{
     question: "What is your analysis of the relationship between human activities and climate change based on this passage?",
     answerType: "text"
   }]
-  
+
+// interface Answer {
+//     userInput: any; // this could be a multiple choice object or
+//     feedback: string;
+// }
   
 
 export const InteractivePlayer = ({}) => {
     const [currentPageIndex, setCurrentPageIndex] = useState(0)
-    const page =  DATA[currentPageIndex]
+    const page = DATA[currentPageIndex]
+    const [nextDisabled, setNextDisabled] = useState(true)
+    const [answer, setAnswer] = useState('')
+    const [multipleChoiceAnswer, setMultipleChoiceAnswer] = useState('')
+    const [answerReceived, setAnswerReceived] = useState(false)
+    const formRef = useRef<HTMLFormElement>(null)
 
-    return <div>
-        <Content text={page.content.join('\n')} />
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        // TODO: Implement API call
+        setNextDisabled(false)
+        setAnswerReceived(true)
+    }
 
-        {page != null && <QuestionAnswer data={page} />}
-        {page == null && <>Final page</> }
+    const handleContinue = () => {
+        setAnswer('')
+        setMultipleChoiceAnswer('')
+        setAnswerReceived(false)
+        setCurrentPageIndex((val) => val + 1)
+        formRef.current?.reset()
+    }
 
-        <div className="flex items-end fill-slate-400">
-            <button onClick={() => {
-                setCurrentPageIndex((val) => val + 1)
-            }} >
-                Next
-            </button>
+    if (!page) {
+        return <FinalPage />
+    }
+
+    return (
+        <div>
+            {page != null && 
+                <div className="max-w-2xl">
+                <p className="whitespace-pre-wrap leading-relaxed">
+                  {page.content}
+                </p>
+              </div>
+            }
+
+            {/* question - answer section */}
+            {page != null && (
+                <div className="w-full max-w-2xl flex flex-col gap-6">
+                    <p className="font-semibold">
+                        {page.question}
+                    </p>
+                    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        {page.answerType === 'multipleChoice' && (
+                            <>
+                                <div className="flex flex-col gap-3">
+                                    {page.multipleChoice?.map((choice, index) => (
+                                        <label key={index} className="flex items-center gap-2">
+                                            <input
+                                                type="radio"
+                                                name="multipleChoice"
+                                                value={choice.answer}
+                                                onChange={(e) => setMultipleChoiceAnswer(e.target.value)}
+                                                className="w-4 h-4 text-blue-500"
+                                                disabled={answerReceived}
+                                            />
+                                            <span className={answerReceived ? (
+                                                choice.correct ? "text-green-600 font-medium" : 
+                                                choice.answer === multipleChoiceAnswer ? "text-red-600" : ""
+                                            ) : ""}>
+                                                {choice.answer}
+                                                {answerReceived && choice.correct && (
+                                                    <span className="ml-2 text-green-600">✓</span>
+                                                )}
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                        {page.answerType === 'text' && (
+                            <>
+                                <textarea
+                                    value={answer}
+                                    onChange={(e) => setAnswer(e.target.value)}
+                                    className="w-full h-32 p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-gray-100"
+                                    placeholder="Type your answer here..."
+                                />
+                            </>
+                        )}
+                        {!answerReceived && <button
+                            type="submit"
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+                            disabled={(!multipleChoiceAnswer && !answer) || answerReceived}
+                        >
+                            Submit
+                        </button>}
+                    </form>
+                </div>
+            )}
+
+            {answerReceived && <div className="p-4 flex items-end fill-slate-400 justify-end">
+                <button 
+                    onClick={handleContinue}
+                    disabled={nextDisabled}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center content-end gap-2"
+                >
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>}
         </div>
-    </div>
+    )
+}
+
+const FinalPage = () => {
+    return (
+        <div className="flex flex-col items-center justify-center gap-4 py-12">
+            <h2 className="text-2xl font-bold text-gray-800">
+                Congratulations!
+            </h2>
+            <p className="text-gray-600 text-center max-w-md">
+                You have completed all the questions.
+            </p>
+        </div>
+    )
 }

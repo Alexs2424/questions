@@ -1,6 +1,4 @@
-import Content from "./_components/Content";
 import { InteractivePlayer } from "./_components/InteractivePlayer";
-import QuestionAnswer from "./_components/QuestionAnswer";
 import { fetchApi } from "./actions";
 
 export default async function Home() {
