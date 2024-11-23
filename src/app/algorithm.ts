@@ -1,3 +1,5 @@
+'use server'
+
 import { Anthropic } from '@anthropic-ai/sdk';
 import type { Page } from './dataschema';
 import { generateMultipleChoicePage, generateTextPage } from './questions';
@@ -6,16 +8,16 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || ''
 });
 
-export async function handleQuestionAnswered(page: Page, selection?: number, response?: string) {
-    if(page.multipleChoice && selection) {
-        return explainMultipleChoiceResponse(page.content[0], page.question, page.multipleChoice[selection].answer, page.multipleChoice[selection].correct);
+export async function handleQuestionAnswered(page: Page, multipleChoiceAnswer?: string, response?: string, isCorrect?: boolean) {
+    if (page.multipleChoice && multipleChoiceAnswer) {
+        return explainMultipleChoiceResponse(page.content.join(' '), page.question, multipleChoiceAnswer, isCorrect || false);
     }
-    if(response) {
-        return evaluateTextResponse(page.content[0], page.question, response);
+    if (response) {
+        return evaluateTextResponse(page.content.join(' '), page.question, response);
     }
 }
   
-interface TextEvaluation {
+export interface TextEvaluation {
     isCorrect: boolean;
     explanation: string;
     confidence: number;  // 0-1 score of how confident the evaluation is
@@ -56,6 +58,19 @@ export async function generateQuestionVariation(content: string, originalQuestio
         return originalQuestion;
     }
 }
+
+// Test data
+const testEvaluation: TextEvaluation = {
+    isCorrect: true,
+    explanation: "The answer correctly identifies that implementing financial regulations and social safety nets were key lessons from the Great Depression.",
+    confidence: 0.95
+};
+
+const testEvaluationIncorrect: TextEvaluation = {
+    isCorrect: false, 
+    explanation: "The answer oversimplifies the lessons by focusing only on stock market crashes while ignoring other important factors.",
+    confidence: 0.87
+};
 
 export async function explainMultipleChoiceResponse(
     content: string,

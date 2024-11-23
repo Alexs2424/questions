@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react"
 import { Page } from "../dataschema"
+import { handleQuestionAnswered, TextEvaluation } from "../algorithm"
 
 export const DATA: Page[] = [{
     content: [
@@ -59,6 +60,19 @@ export const DATA: Page[] = [{
     answerType: "text"
   }]
 
+// Test data
+const testEvaluation: TextEvaluation = {
+    isCorrect: true,
+    explanation: "The answer correctly identifies that implementing financial regulations and social safety nets were key lessons from the Great Depression.",
+    confidence: 0.95
+};
+
+const testEvaluationIncorrect: TextEvaluation = {
+    isCorrect: false, 
+    explanation: "The answer oversimplifies the lessons by focusing only on stock market crashes while ignoring other important factors.",
+    confidence: 0.87
+};
+
 // interface Answer {
 //     userInput: any; // this could be a multiple choice object or
 //     feedback: string;
@@ -70,12 +84,22 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
     const [nextDisabled, setNextDisabled] = useState(true)
     const [answer, setAnswer] = useState('')
     const [multipleChoiceAnswer, setMultipleChoiceAnswer] = useState('')
+    const [isCorrect, setIsCorrect] = useState<boolean>(false)
+
     const [answerReceived, setAnswerReceived] = useState(false)
+    const [evaluation, setEvaluation] = useState<TextEvaluation>()
     const formRef = useRef<HTMLFormElement>(null)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         // TODO: Implement API call
+        
+        const evaluationResponse = await handleQuestionAnswered(page, multipleChoiceAnswer || undefined, answer || undefined, isCorrect)
+        // const evaluationResponse = testEvaluation
+        if (evaluationResponse) {
+            setEvaluation(evaluationResponse)
+        }
+        
         setNextDisabled(false)
         setAnswerReceived(true)
     }
@@ -120,7 +144,10 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
                                                     type="radio"
                                                     name="multipleChoice"
                                                     value={choice.answer}
-                                                    onChange={(e) => setMultipleChoiceAnswer(e.target.value)}
+                                                    onChange={(e) => {
+                                                        setMultipleChoiceAnswer(choice.answer)
+                                                        setIsCorrect(choice.correct)
+                                                    }}
                                                     className="w-4 h-4 text-blue-500"
                                                     disabled={answerReceived}
                                                 />
@@ -157,6 +184,35 @@ export const InteractivePlayer = ({pages}: {pages: Page[]}) => {
                             </button>}
                         </form>
                     </div>
+                    {answerReceived && evaluation && (
+                        <div className={`p-4 rounded-lg border ${evaluation.isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                            <div className="flex items-center gap-2 mb-2">
+                                {evaluation.isCorrect ? (
+                                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                ) : (
+                                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                )}
+                                <span className={`font-medium ${evaluation.isCorrect ? 'text-green-800' : 'text-red-800'}`}>
+                                    {evaluation.isCorrect ? 'Correct!' : 'Incorrect'}
+                                </span>
+                            </div>
+                            <p className="text-gray-700 mb-3">{evaluation.explanation}</p>
+                            {page.answerType == 'text' && <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-600">Confidence:</span>
+                                <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-[200px]">
+                                    <div 
+                                        className={`h-2 rounded-full ${evaluation.isCorrect ? 'bg-green-500' : 'bg-red-500'}`}
+                                        style={{ width: `${evaluation.confidence * 100}%` }}
+                                    ></div>
+                                </div>
+                                <span className="text-sm text-gray-600">{Math.round(evaluation.confidence * 100)}%</span>
+                            </div>}
+                        </div>
+                    )}
 
                     {answerReceived && <div className="p-4 flex items-end fill-slate-400 justify-end">
                         <button 
