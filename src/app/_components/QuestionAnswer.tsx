@@ -1,11 +1,8 @@
-
-
-
 'use client'
 
 import { useState } from 'react'
 
-export default function QuestionAnswer() {
+export default function QuestionAnswer({data}: {data: Page}) {
   const [question, setQuestion] = useState('')
   const [answer, setAnswer] = useState('')
 
@@ -17,13 +14,30 @@ export default function QuestionAnswer() {
 
   return (
     <div className="w-full max-w-2xl flex flex-col gap-6">
+        <p className="font-semibold">
+            {data.question}
+        </p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <textarea
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ask a question..."
-          className="w-full p-4 border rounded-lg resize-none min-h-[100px]"
-        />
+        {
+            data.answerType === 'multipleChoice' && (
+                <>
+                <div className="flex flex-col gap-3">
+                    {data.multipleChoice?.map((choice, index) => (
+                        <label key={index} className="flex items-center gap-2">
+                            <input
+                                type="radio"
+                                name="multipleChoice"
+                                value={choice.answer}
+                                onChange={(e) => setQuestion(e.target.value)}
+                                className="w-4 h-4 text-blue-500"
+                            />
+                            <span>{choice.answer}</span>
+                        </label>
+                    ))}
+                </div>
+                </>
+            )
+        }
         <button 
           type="submit"
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
